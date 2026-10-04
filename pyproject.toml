@@ -1,0 +1,7 @@
+[project]
+name = "data-quality-and-lineage"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = []
