@@ -1,0 +1,6 @@
+# Text files are stored with LF everywhere, so Windows and Linux checkouts
+# produce identical bytes and committed checksums stay valid.
+* text=auto eol=lf
+
+# The pinned dataset is never touched by git: MANIFEST.json holds its sha256.
+data/nab/** -text

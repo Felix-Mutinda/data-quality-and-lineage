@@ -56,14 +56,20 @@ def main() -> int:
             files.append(fetch(http, f"data/{key}"))
             print(f"ok  {key}")
 
-    (OUT / "MANIFEST.json").write_text(json.dumps({
+    manifest_path = OUT / "MANIFEST.json"
+    fetched_at = dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds")
+    if manifest_path.exists():
+        previous = json.loads(manifest_path.read_text(encoding="utf-8"))
+        if previous.get("files") == files:   # nothing changed: keep the file byte-identical
+            fetched_at = previous["fetched_at"]
+    manifest_path.write_text(json.dumps({
         "source": "Numenta Anomaly Benchmark (NAB), MIT licence",
         "repo": "https://github.com/numenta/NAB",
         "commit": COMMIT,
         "corpus": CORPUS,
-        "fetched_at": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"),
+        "fetched_at": fetched_at,
         "files": files,
-    }, indent=2) + "\n")
+    }, indent=2) + "\n", encoding="utf-8", newline="\n")
     print(f"\n{len(series)} series + {len(LABEL_FILES)} label files -> {OUT.relative_to(ROOT)}")
     return 0
 
