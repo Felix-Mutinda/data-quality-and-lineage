@@ -27,7 +27,11 @@ share `(series, timestamp)` into their **average** and records
 `readings_collapsed` (1 for normal rows, 12 for the two DST rows), so the
 repair is visible to anyone downstream. No row order is invented.
 
-### D2. Tests on the staging model, thresholds from the profile
+### D2. Tests on the typed readings, thresholds from the profile
+
+The tests run on `int_metrics__contracted`: the staging readings joined
+(left join) to their contract in `seeds/series_catalog.csv`, plus two derived
+signals, `seconds_since_previous` and `minutes_unchanged`.
 
 | Test | Scope | Rule | Why this threshold | Baseline |
 |---|---|---|---|---|
@@ -58,6 +62,36 @@ alert-fatigue outcomes, measurable against the labels:
 
 - stuck high: a level shift the detector reads as an anomaly, an alert storm
 - stuck during a labelled incident: the real incident is missed
+
+### D5. Severity: structural tests stop the build, behavioural tests warn
+
+Not-null, uniqueness, physical bounds and "every series has a contract" fail
+with **error**: a hit means the pipeline itself is wrong, nothing downstream
+should be trusted. Silence and stuck-agent fail with **warn**: a hit means one
+source is misbehaving, and halting monitoring for the whole fleet because one
+agent is stuck would be the worse outcome. That trade-off is the reason
+downstream blast radius matters: on a warning, the bad data keeps flowing.
+
+Measured headroom on clean data: longest unchanged run on checked series
+35 min (threshold 120), longest silence 64 min (threshold 120).
+
+### D6. Staging uses try_cast, never cast
+
+Found by mutation-testing the tests: with a hard `cast`, one unparseable
+timestamp crashed the staging view and every test reported ERROR with no
+failing rows. With `try_cast` the bad value becomes NULL and the not-null test
+reports the exact row. Every test was checked against an injected defect:
+
+| Injected into raw | Test that fired |
+|---|---|
+| CPU value 150 | value_within_physical_bounds (FAIL 1) |
+| CPU value constant for 3 h | no_stuck_agent_over_2h (WARN 12) |
+| 3 h of readings deleted | no_silence_over_2h (WARN 1) |
+| series not in the catalogue | every_series_has_a_contract (FAIL 1) |
+| unparseable timestamp / value | not-null on measured_at / value (FAIL 1 each) |
+
+Uniqueness cannot be triggered from raw (staging collapses duplicates by
+design, D1); it guards that repair against regressions.
 
 ### Not decided yet
 

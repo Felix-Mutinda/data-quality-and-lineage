@@ -1,0 +1,13 @@
+sources:
+  - name: nab
+    description: >
+      NAB realAWSCloudwatch, pinned to numenta/NAB@ea702d7, loaded verbatim
+      (all text) by ingest/load_warehouse.py.
+    schema: raw
+    tables:
+      - name: metrics
+        identifier: nab_metrics
+        description: One row per CSV line, exactly as published.
+      - name: anomaly_windows
+        identifier: nab_anomaly_windows
+        description: NAB's hand-labelled anomaly windows, one row per window.

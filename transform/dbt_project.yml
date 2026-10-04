@@ -1,0 +1,30 @@
+name: monitoring
+version: "0.1.0"
+config-version: 2
+profile: monitoring
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+macro-paths: ["macros"]
+target-path: target
+clean-targets: [target, dbt_packages]
+
+models:
+  monitoring:
+    staging:
+      +materialized: view
+      +schema: staging
+    intermediate:
+      +materialized: view
+      +schema: intermediate
+
+seeds:
+  monitoring:
+    +schema: reference
+
+data_tests:
+  monitoring:
+    # Keep the rows each failing test found, in schema test_failures.
+    +store_failures: true
+    +schema: test_failures

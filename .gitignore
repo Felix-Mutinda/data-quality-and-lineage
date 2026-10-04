@@ -8,16 +8,12 @@ transform/target/
 transform/dbt_packages/
 transform/logs/
 transform/package-lock.yml
+transform/.user.yml
 logs/
 
-# local state (rebuilt by `make reset`)
-warehouse/*.duckdb
-warehouse/*.duckdb.wal
+# local state, rebuilt from data/ by ingest/load_warehouse.py
+warehouse/
 outputs/
 scenarios/.last_break.json
 triage/reports/
 lineage-events/
-
-# raw downloads (the pinned slice in data/ IS committed)
-data/_downloads/
-transform/.user.yml

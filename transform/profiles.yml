@@ -1,0 +1,11 @@
+# Run dbt from the repo root with:
+#   DBT_PROJECT_DIR=transform  DBT_PROFILES_DIR=transform
+# so the warehouse path below resolves to <repo>/warehouse/monitoring.duckdb,
+# the same file ingest/load_warehouse.py builds.
+monitoring:
+  target: local
+  outputs:
+    local:
+      type: duckdb
+      path: "{{ env_var('DUCKDB_PATH', 'warehouse/monitoring.duckdb') }}"
+      threads: 4

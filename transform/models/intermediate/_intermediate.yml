@@ -1,0 +1,52 @@
+models:
+  - name: int_metrics__contracted
+    description: >
+      Typed readings joined to their contract, with the derived signals the
+      behavioural tests need. Every test threshold below comes from
+      profiling/DECISIONS.md (D2, D5).
+    data_tests:
+      # ---- structural: a hit means the pipeline is wrong; stop (D5) -------------
+      - dbt_expectations.expect_compound_columns_to_be_unique:
+          name: one_reading_per_series_per_timestamp
+          arguments:
+            column_list: [series_id, measured_at]
+
+      - dbt_expectations.expression_is_true:
+          name: value_within_physical_bounds
+          arguments:
+            expression: "value >= min_value and (max_value is null or value <= max_value)"
+
+      # ---- behavioural: a hit means one source is misbehaving; warn (D5) --------
+      - dbt_expectations.expression_is_true:
+          name: no_silence_over_2h
+          arguments:
+            expression: "coalesce(seconds_since_previous, 0) <= 7200"
+          config:
+            severity: warn
+
+      - dbt_expectations.expression_is_true:
+          name: no_stuck_agent_over_2h
+          arguments:
+            expression: "minutes_unchanged < 120"
+            row_condition: "stuck_check"
+          config:
+            severity: warn
+    columns:
+      - name: series_id
+        data_tests:
+          - dbt_expectations.expect_column_values_to_not_be_null
+      - name: measured_at
+        data_tests:
+          - dbt_expectations.expect_column_values_to_not_be_null
+      - name: value
+        data_tests:
+          - dbt_expectations.expect_column_values_to_not_be_null
+      - name: metric
+        description: Null when the series has no entry in seeds/series_catalog.csv.
+        data_tests:
+          - dbt_expectations.expect_column_values_to_not_be_null:
+              name: every_series_has_a_contract
+      - name: readings_collapsed
+        description: 1 for normal readings; >1 where staging repaired duplicate timestamps (D1).
+      - name: seconds_since_previous
+      - name: minutes_unchanged
