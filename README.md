@@ -1,5 +1,7 @@
 # data-quality-and-lineage
 
+![Data quality and lineage: from a failing test to its blast radius](docs/img/github-readme.png)
+
 **From a failing data quality test to its blast radius.**
 
 A data quality test tells you something is wrong. Lineage tells you what that
