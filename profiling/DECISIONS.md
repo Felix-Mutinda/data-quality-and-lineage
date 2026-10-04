@@ -155,3 +155,14 @@ missed, and on-call was then paged three times for nothing. The only signal
 is a warning (D5), so the build succeeds and the bad readings flow on to
 every model and consumer downstream. Estimating that blast radius is the
 rest of this repo.
+
+### D10. A failing test must say which rows failed
+
+Checked on the D9 scenario: out of the box, the stuck-agent warning stored 122
+rows containing only `expression = false`. No series, no timestamp, so the
+failure could not be traced to a single reading. dbt-expectations dispatches
+`expression_is_true`; the project overrides it
+(`transform/macros/triageable_expression_is_true.sql`) so stored failures keep
+the whole row. With `minutes_unchanged` in the row, triage can also recover
+when the agent actually got stuck (03:37), two hours before the test could see
+it (05:37).

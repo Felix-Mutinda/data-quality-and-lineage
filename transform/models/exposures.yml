@@ -1,0 +1,13 @@
+exposures:
+  # The consumers dbt knows about are the ones someone declared here.
+  - name: oncall_pager
+    label: On-call pager
+    type: application
+    maturity: high
+    description: >
+      Sends every row of fct_alerts to the on-call rotation.
+    depends_on:
+      - ref('fct_alerts')
+    owner:
+      name: SRE on-call
+      email: oncall@example.org

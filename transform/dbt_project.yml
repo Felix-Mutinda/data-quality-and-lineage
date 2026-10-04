@@ -38,3 +38,9 @@ data_tests:
     # Keep the rows each failing test found, in schema test_failures.
     +store_failures: true
     +schema: test_failures
+
+dispatch:
+  # Let this project override dbt_expectations macros
+  # (macros/triageable_expression_is_true.sql).
+  - macro_namespace: dbt_expectations
+    search_order: ["monitoring", "dbt_expectations"]
