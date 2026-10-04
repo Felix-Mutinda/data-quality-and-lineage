@@ -93,8 +93,36 @@ reports the exact row. Every test was checked against an injected defect:
 Uniqueness cannot be triggered from raw (staging collapses duplicates by
 design, D1); it guards that repair against regressions.
 
+### D7. Detector: trailing z-score with a noise floor for percent metrics
+
+Measured in `profiling/reports/detector_tuning.md` (`profiling/tune_detector.py`
+over clean data, scored against the labelled windows).
+
+`z = (value - mean) / max(stddev, noise_floor)` over the previous 288 readings
+(24 h), no score during warm-up, breach when `|z| > 4`.
+
+- **k = 4.** Against k = 3 it keeps the same recall (0.73) with 30 % fewer
+  pages (274 vs 389). k = 5 loses recall (0.67) for 23 % fewer pages.
+- **Noise floor of 1 percentage point on percent metrics** (catalogue column
+  `noise_floor`). Without it the no-anomaly control series `c6585a` pages 13
+  times on ±0.07 % blips (F8); with it, 0. The cost is real and stated: the
+  labelled anomalies on the two near-idle CPU series (`24ae8d`, `53ea38`) are
+  smaller than 1 point and are no longer detected (recall 0.83 to 0.73).
+
+### D8. Alerting: 30-minute episodes, 60-minute cooldown
+
+Breaches less than 30 min apart are one episode; an episode starting within
+60 min of the previous one's end is suppressed. 623 breaches become 353
+episodes become **274 pages**: 1.17 pages per series per day, about 20 a day
+for this 17-series fleet, with no loss of recall. A 4-hour cooldown would
+halve pages again but starts missing incidents (recall 0.70).
+
+What the baseline says about alert fatigue, before any bad data:
+**83 % of pages land outside a labelled incident** (precision 0.17), mostly on
+bursty byte counters (disk, network) where a z-score is a weak model. That is
+the noise floor of this system. The scenario (D4) is measured against it.
+
 ### Not decided yet
 
-Detector design, alert de-duplication/cooldown and alert thresholds are set
-after a baseline run of the detector over clean data, by the same rule:
-measure first, then decide.
+Scenario parameters (which series, when, how long, stuck at what value) are
+chosen next, against this baseline.

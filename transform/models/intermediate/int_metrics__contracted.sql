@@ -15,6 +15,7 @@ with readings as (
         c.min_value,
         c.max_value,
         c.stuck_check,
+        c.noise_floor,
         lag(m.measured_at) over w as previous_measured_at,
         lag(m.value)       over w as previous_value
     from {{ ref('stg_nab__metrics') }} as m
@@ -43,6 +44,7 @@ select
     min_value,
     max_value,
     stuck_check,
+    noise_floor,
     epoch(measured_at - previous_measured_at)::integer as seconds_since_previous,
     (epoch(measured_at - min(measured_at) over (partition by series_id, value_run_id)) / 60)::integer
         as minutes_unchanged

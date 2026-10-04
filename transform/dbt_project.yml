@@ -18,6 +18,16 @@ models:
     intermediate:
       +materialized: view
       +schema: intermediate
+    marts:
+      +materialized: table
+      +schema: marts
+
+vars:
+  # Detector and alerting settings, chosen from profiling/reports/detector_tuning.md (D7, D8)
+  detector_baseline_readings: 288   # trailing 24 h at 5-minute cadence
+  detector_z_threshold: 4
+  alert_merge_minutes: 30
+  alert_cooldown_minutes: 60
 
 seeds:
   monitoring:

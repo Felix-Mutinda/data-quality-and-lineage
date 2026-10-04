@@ -1,0 +1,38 @@
+models:
+  - name: dim_resources
+    description: One row per monitored series; identity and contract only, no measured values.
+    columns:
+      - name: series_id
+        data_tests:
+          - dbt_expectations.expect_column_values_to_be_unique
+      - name: resource_type
+      - name: resource_id
+      - name: metric
+      - name: unit
+
+  - name: fct_alerts
+    description: One row per page sent to on-call (episodes that survived the cooldown).
+    columns:
+      - name: alert_id
+        data_tests:
+          - dbt_expectations.expect_column_values_to_be_unique
+      - name: series_id
+      - name: resource_type
+      - name: resource_id
+      - name: metric
+      - name: alerted_at
+      - name: episode_end
+      - name: breach_count
+      - name: peak_z
+      - name: direction
+
+  - name: fct_alert_scorecard
+    description: Pages, precision and recall per series against NAB's labelled windows.
+    columns:
+      - name: series_id
+      - name: days_observed
+      - name: pages
+      - name: pages_per_day
+      - name: pages_in_labelled_window
+      - name: labelled_windows
+      - name: labelled_windows_paged

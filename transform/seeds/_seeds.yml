@@ -2,10 +2,13 @@ seeds:
   - name: series_catalog
     description: >
       The data contract per series: what it measures, its unit, its physical
-      bounds and whether a constant value is suspicious. Every value here is
-      justified in profiling/DECISIONS.md (D2). Empty max_value = no upper bound.
+      bounds, whether a constant value is suspicious, and the smallest change
+      worth scoring as an anomaly. Every value here is justified in
+      profiling/DECISIONS.md (D2, D7). Empty max_value = no upper bound;
+      noise_floor 0 = no floor.
     config:
       column_types:
         min_value: double
         max_value: double
         stuck_check: boolean
+        noise_floor: double
