@@ -5,9 +5,14 @@
 --
 -- LEFT join on purpose: a series missing from the catalogue must surface as a
 -- test failure (null metric), not silently disappear.
+-- Columns are listed explicitly in every model: `select *` hides column-level
+-- lineage from the SQL parser that OpenLineage uses.
 with readings as (
     select
-        m.*,
+        m.series_id,
+        m.measured_at,
+        m.value,
+        m.readings_collapsed,
         c.resource_type,
         c.resource_id,
         c.metric,
@@ -25,7 +30,8 @@ with readings as (
 
 runs as (
     select
-        *,
+        series_id, measured_at, value, readings_collapsed, resource_type, resource_id,
+        metric, unit, min_value, max_value, stuck_check, noise_floor, previous_measured_at,
         -- a new run starts whenever the value differs from the previous reading
         sum(case when value is distinct from previous_value then 1 else 0 end)
             over (partition by series_id order by measured_at) as value_run_id

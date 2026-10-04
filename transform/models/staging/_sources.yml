@@ -5,9 +5,9 @@ sources:
       (all text) by ingest/load_warehouse.py.
     schema: raw
     tables:
-      - name: metrics
-        identifier: nab_metrics
+      # Table names match the warehouse exactly (no `identifier:` alias), so the
+      # dataset names in lineage events are the real table names.
+      - name: nab_metrics
         description: One row per CSV line, exactly as published.
-      - name: anomaly_windows
-        identifier: nab_anomaly_windows
+      - name: nab_anomaly_windows
         description: NAB's hand-labelled anomaly windows, one row per window.

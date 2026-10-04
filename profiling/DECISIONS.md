@@ -166,3 +166,85 @@ failure could not be traced to a single reading. dbt-expectations dispatches
 the whole row. With `minutes_unchanged` in the row, triage can also recover
 when the agent actually got stuck (03:37), two hours before the test could see
 it (05:37).
+
+### D11. Lineage across tool boundaries: what it took, and what it still misses
+
+OpenLineage events were captured to a file and inspected before Marquez was
+involved. Findings, and what was changed because of them:
+
+| Finding | Effect | Change |
+|---|---|---|
+| dbt-ol names a source by its dbt `name`, ignoring `identifier:` | lineage showed `raw.metrics`, a table that does not exist, so ingestion and dbt would not join | source tables renamed to the real table names |
+| Column lineage stops at `select *` | `fct_alerts.peak_z` traced back only to `int_alert_episodes`, not to the reading | every model lists its columns; the chain now runs `raw.nab_metrics.value` to `fct_alerts.peak_z` |
+| The SQL parser reports some CTE names (`baseline`, `episodes`) as input datasets | phantom nodes in column lineage | not fixable in SQL; triage ignores names that are not `<db>.<schema>.<table>` |
+| dbt-ol emits nothing for seeds | `series_catalog` is invisible; `dim_resources` appears to have no upstream | none; stated as a blind spot of this integration |
+| dbt-ol does not read `DBT_PROJECT_DIR` / `DBT_PROFILES_DIR` | fails to find the project | pass `--project-dir transform --profiles-dir transform` |
+
+Code outside dbt reports itself with `lineage/emit.py`, using exactly the
+dataset names dbt-ol uses (`duckdb://<profile path>`, `<db>.<schema>.<table>`).
+Ingestion and four consumers do so:
+
+| Job | Reads | Declared to dbt? |
+|---|---|---|
+| `ingest.load_warehouse` | the pinned NAB files | n/a (upstream) |
+| `consumers.notify_oncall` | `marts.fct_alerts` | yes, exposure `oncall_pager` |
+| `consumers.oncall_noise_report` | `marts.fct_alert_scorecard` | no |
+| `consumers.daily_cpu_rollup` | `intermediate.int_metrics__contracted` | no |
+| `consumers.resource_inventory` | `intermediate.int_metrics__contracted`, identity columns only | no |
+
+Lineage emission never breaks the job it describes: if the backend is down the
+script completes and prints a warning.
+
+### D12. Column lineage needs documented columns, and only sees direct dependencies
+
+Found by querying Marquez (0.51.1) on the D9 scenario:
+
+1. **Undocumented models are column-lineage dead ends.** Marquez keeps a
+   column edge only when both ends are columns it knows, and it learns a
+   dataset's columns from the `schema` facet, which dbt-ol only sends for
+   columns documented in YAML. With `stg_nab__metrics`, `int_metrics__scored`
+   and `int_alert_episodes` undocumented, the column graph from
+   `raw.nab_metrics.value` came back empty. Every model now documents every
+   column, `lineage/emit.py` sends input schemas too (the NAB files), and every
+   test names the column it protects (`meta.checks_column`).
+2. **Table-level and column-level lineage err in opposite directions.**
+   `triage/lineage_blast_radius.py` on the stuck-agent scenario:
+
+   | consumer | table-level | column-level | truth |
+   |---|---|---|---|
+   | `daily_cpu_rollup` | affected | affected (`avg_cpu`, `max_cpu`) | affected |
+   | `notify_oncall` | affected | affected (`summary`) | affected (3 false pages, 1 missing) |
+   | `oncall_noise_report` | affected | **not affected** | affected: its page counts changed |
+   | `resource_inventory` | **affected** | not affected | not affected: identity columns only |
+
+   Table-level lineage over-reports (`resource_inventory` reads only
+   identity columns). Column-level lineage under-reports: it follows only
+   direct dependencies, and which pages *exist* depends on `value` through a
+   `where is_breach` filter and a `count(*)`, so the noise report is invisible
+   to it. The truth sits between the two; the triage reports both and lists
+   the disagreements for a human to settle.
+
+### D13. Settle the blast radius with evidence
+
+Lineage predicts; a diff proves. `triage/verify_blast_radius.py` snapshots
+every consumer's output after a clean run and compares it with the output
+after the stuck-agent run:
+
+| consumer | rows removed | rows added | affected | table-level | column-level |
+|---|---|---|---|---|---|
+| `daily_cpu_rollup` | 1 | 1 | **yes** | affected | affected |
+| `oncall_noise_report` | 1 | 1 | **yes** | affected | not affected |
+| `notify_oncall` | 2 | 3 | **yes** | affected | affected |
+| `resource_inventory` | 0 | 0 | no | affected | not affected |
+
+- `pages.jsonl`: the real incident page (05:42, z = 57.9) and the 11:42 page
+  are gone; three false pages (18:12, 23:22, 06:02) were sent.
+- `oncall_noise_report.csv`: fe7f93 goes from 36 pages, 92 % noise, to 37
+  pages, 97 % noise; the fault makes a noisy series look noisier.
+- `daily_cpu.csv`: 17 Feb average CPU reads 3.3 % instead of 9.3 %.
+
+The verified blast radius is three of four consumers, two of them never
+declared to dbt. Table-level lineage over-reported by one
+(`resource_inventory`); column-level lineage under-reported by one
+(`oncall_noise_report`). Each view alone is wrong in a predictable direction;
+read together, with the diff to settle the disagreements, they are right.

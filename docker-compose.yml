@@ -1,0 +1,56 @@
+# Marquez: the OpenLineage backend and lineage UI. Nothing else runs in Docker;
+# DuckDB, dbt and the scripts run on the host.
+#
+#   docker compose up -d      API http://localhost:5000   UI http://localhost:3000
+#   docker compose down -v    stop and delete all lineage history
+#
+# Self-contained: Postgres is created with the user/database that Marquez's
+# built-in config (marquez.dev.yml in the image) expects, and search
+# (OpenSearch) is switched off.
+
+name: data-quality-and-lineage
+
+services:
+  marquez-db:
+    image: postgres:14
+    environment:
+      POSTGRES_USER: marquez
+      POSTGRES_PASSWORD: marquez
+      POSTGRES_DB: marquez
+    volumes:
+      - marquez-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U marquez -d marquez"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  marquez-api:
+    image: marquezproject/marquez:0.51.1
+    environment:
+      MARQUEZ_PORT: 5000
+      MARQUEZ_ADMIN_PORT: 5001
+      POSTGRES_HOST: marquez-db
+      POSTGRES_PORT: 5432
+      SEARCH_ENABLED: "false"
+    ports:
+      - "5000:5000"   # OpenLineage endpoint: POST /api/v1/lineage
+      - "5001:5001"   # admin / healthcheck
+    depends_on:
+      marquez-db:
+        condition: service_healthy
+
+  marquez-web:
+    image: marquezproject/marquez-web:0.51.1
+    environment:
+      MARQUEZ_HOST: marquez-api
+      MARQUEZ_PORT: 5000
+      WEB_PORT: 3000
+      REACT_APP_ADVANCED_SEARCH: "false"
+    ports:
+      - "3000:3000"
+    depends_on:
+      - marquez-api
+
+volumes:
+  marquez-db:

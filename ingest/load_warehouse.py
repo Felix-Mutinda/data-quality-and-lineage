@@ -14,11 +14,15 @@ from __future__ import annotations
 
 import json
 import os
+import sys
 from pathlib import Path
 
 import duckdb
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+from lineage.emit import file, lineage_run, table  # noqa: E402
+
 NAB = ROOT / "data" / "nab"
 WAREHOUSE = Path(os.environ.get("DUCKDB_PATH", ROOT / "warehouse" / "monitoring.duckdb"))
 
@@ -28,7 +32,29 @@ def main() -> int:
     if not manifest.exists():
         raise SystemExit("data/nab not found. Run `uv run python ingest/fetch_nab.py` first.")
     corpus = json.loads(manifest.read_text())["corpus"]
+    series_files, windows_file, points_file = (
+        file(f"data/nab/{corpus}"), file("data/nab/labels/combined_windows.json"),
+        file("data/nab/labels/combined_labels.json"))
+    with lineage_run("ingest.load_warehouse", inputs=[series_files, windows_file, points_file]) as run:
+        load(corpus)
+        run.output(table("raw", "nab_metrics"), columns={
+            "series_file": [(series_files, "filename")],
+            "timestamp":   [(series_files, "timestamp")],
+            "value":       [(series_files, "value")],
+        })
+        run.output(table("raw", "nab_anomaly_windows"), columns={
+            "series_file":  [(windows_file, "key")],
+            "window_start": [(windows_file, "window_start")],
+            "window_end":   [(windows_file, "window_end")],
+        })
+        run.output(table("raw", "nab_anomaly_points"), columns={
+            "series_file": [(points_file, "key")],
+            "labelled_at": [(points_file, "timestamp")],
+        })
+    return 0
 
+
+def load(corpus: str) -> None:
     WAREHOUSE.parent.mkdir(parents=True, exist_ok=True)
     for f in (WAREHOUSE, Path(f"{WAREHOUSE}.wal")):
         f.unlink(missing_ok=True)
@@ -63,11 +89,11 @@ def main() -> int:
         [(k, t) for k, ts in points.items() if k.startswith(f"{corpus}/") for t in ts],
     )
 
-    for table in ("nab_metrics", "nab_anomaly_windows", "nab_anomaly_points"):
-        n, s = con.execute(f"select count(*), count(distinct series_file) from raw.{table}").fetchone()
-        print(f"raw.{table:<20} {n:>6} rows  {s:>2} series")
+    for name in ("nab_metrics", "nab_anomaly_windows", "nab_anomaly_points"):
+        n, s = con.execute(f"select count(*), count(distinct series_file) from raw.{name}").fetchone()
+        print(f"raw.{name:<20} {n:>6} rows  {s:>2} series")
     print(f"warehouse -> {WAREHOUSE}")
-    return 0
+    con.close()
 
 
 if __name__ == "__main__":

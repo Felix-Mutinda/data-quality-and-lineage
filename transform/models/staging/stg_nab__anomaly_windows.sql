@@ -3,4 +3,4 @@ select
     replace(replace(series_file, 'realAWSCloudwatch/', ''), '.csv', '') as series_id,
     try_cast(window_start as timestamp)                                    as window_start,
     try_cast(window_end as timestamp)                                      as window_end
-from {{ source('nab', 'anomaly_windows') }}
+from {{ source('nab', 'nab_anomaly_windows') }}

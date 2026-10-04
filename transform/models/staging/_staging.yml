@@ -1,0 +1,19 @@
+# Every column is listed, even without tests: dbt-ol only sends a dataset's
+# schema to the lineage backend for documented columns, and Marquez only keeps
+# column-level edges between columns it knows exist (DECISIONS.md D12).
+models:
+  - name: stg_nab__metrics
+    description: One typed reading per series per timestamp (D1 repair applied).
+    columns:
+      - name: series_id
+      - name: measured_at
+      - name: value
+      - name: readings_collapsed
+        description: 1 for normal readings; >1 where duplicate timestamps were averaged (D1).
+
+  - name: stg_nab__anomaly_windows
+    description: NAB's labelled anomaly windows, typed.
+    columns:
+      - name: series_id
+      - name: window_start
+      - name: window_end

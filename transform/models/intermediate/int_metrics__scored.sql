@@ -8,7 +8,10 @@
 
 with baseline as (
     select
-        *,
+        series_id,
+        measured_at,
+        value,
+        noise_floor,
         avg(value)         over w as baseline_mean,
         stddev_samp(value) over w as baseline_stddev,
         count(*)           over w as baseline_readings
@@ -20,18 +23,42 @@ with baseline as (
     )
 ),
 
-scored as (
+scaled as (
     select
-        *,
+        series_id,
+        measured_at,
+        value,
+        baseline_mean,
+        baseline_stddev,
+        baseline_readings,
         greatest(coalesce(baseline_stddev, 0), coalesce(noise_floor, 0)) as score_scale
     from baseline
+),
+
+scored as (
+    select
+        series_id,
+        measured_at,
+        value,
+        baseline_mean,
+        baseline_stddev,
+        baseline_readings,
+        score_scale,
+        case
+            when baseline_readings >= {{ n }} and score_scale > 0
+            then (value - baseline_mean) / score_scale
+        end as z_score
+    from scaled
 )
 
 select
-    *,
-    case
-        when baseline_readings >= {{ n }} and score_scale > 0
-        then (value - baseline_mean) / score_scale
-    end as z_score,
+    series_id,
+    measured_at,
+    value,
+    baseline_mean,
+    baseline_stddev,
+    baseline_readings,
+    score_scale,
+    z_score,
     coalesce(abs(z_score) > {{ var('detector_z_threshold') }}, false) as is_breach
 from scored

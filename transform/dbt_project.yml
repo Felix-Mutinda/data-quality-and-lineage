@@ -3,6 +3,9 @@ version: "0.1.0"
 config-version: 2
 profile: monitoring
 
+flags:
+  send_anonymous_usage_stats: false
+
 model-paths: ["models"]
 seed-paths: ["seeds"]
 test-paths: ["tests"]

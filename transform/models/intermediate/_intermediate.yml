@@ -5,16 +5,23 @@ models:
       behavioural tests need. Every test threshold below comes from
       profiling/DECISIONS.md (D2, D5).
     data_tests:
+      # meta.checks_column names the column each test protects; cross-tool
+      # triage traces that column through the lineage graph.
+
       # ---- structural: a hit means the pipeline is wrong; stop (D5) -------------
       - dbt_expectations.expect_compound_columns_to_be_unique:
           name: one_reading_per_series_per_timestamp
           arguments:
             column_list: [series_id, measured_at]
+          config:
+            meta: {checks_column: measured_at}
 
       - dbt_expectations.expression_is_true:
           name: value_within_physical_bounds
           arguments:
             expression: "value >= min_value and (max_value is null or value <= max_value)"
+          config:
+            meta: {checks_column: value}
 
       # ---- behavioural: a hit means one source is misbehaving; warn (D5) --------
       - dbt_expectations.expression_is_true:
@@ -23,6 +30,7 @@ models:
             expression: "coalesce(seconds_since_previous, 0) <= 7200"
           config:
             severity: warn
+            meta: {checks_column: measured_at}
 
       - dbt_expectations.expression_is_true:
           name: no_stuck_agent_over_2h
@@ -31,6 +39,7 @@ models:
             row_condition: "stuck_check"
           config:
             severity: warn
+            meta: {checks_column: value}
     columns:
       - name: series_id
         data_tests:
@@ -48,5 +57,38 @@ models:
               name: every_series_has_a_contract
       - name: readings_collapsed
         description: 1 for normal readings; >1 where staging repaired duplicate timestamps (D1).
+      - name: resource_type
+      - name: resource_id
+      - name: unit
+      - name: min_value
+      - name: max_value
+      - name: stuck_check
+      - name: noise_floor
       - name: seconds_since_previous
       - name: minutes_unchanged
+
+  - name: int_metrics__scored
+    description: Each reading scored against its trailing 24 h baseline (D7).
+    columns:
+      - name: series_id
+      - name: measured_at
+      - name: value
+      - name: baseline_mean
+      - name: baseline_stddev
+      - name: baseline_readings
+      - name: score_scale
+        description: max(baseline_stddev, noise_floor)
+      - name: z_score
+      - name: is_breach
+
+  - name: int_alert_episodes
+    description: Breaches grouped into episodes, with cooldown suppression flagged (D8).
+    columns:
+      - name: series_id
+      - name: episode_no
+      - name: episode_start
+      - name: episode_end
+      - name: breach_count
+      - name: peak_z
+      - name: previous_episode_end
+      - name: is_suppressed

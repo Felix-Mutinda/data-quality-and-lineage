@@ -13,7 +13,7 @@ with typed as (
         replace(replace(series_file, 'realAWSCloudwatch/', ''), '.csv', '') as series_id,
         try_cast("timestamp" as timestamp)                                     as measured_at,
         try_cast("value" as double)                                            as value
-    from {{ source('nab', 'metrics') }}
+    from {{ source('nab', 'nab_metrics') }}
 )
 
 select

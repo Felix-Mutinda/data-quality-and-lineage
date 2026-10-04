@@ -1,0 +1,6 @@
+# Where OpenLineage events go. Read from the working directory by both dbt-ol
+# and lineage/emit.py, so run everything from the repo root.
+transport:
+  type: http
+  url: http://localhost:5000
+  endpoint: api/v1/lineage

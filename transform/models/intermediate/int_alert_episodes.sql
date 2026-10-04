@@ -14,7 +14,9 @@ with breaches as (
 
 numbered as (
     select
-        *,
+        series_id,
+        measured_at,
+        z_score,
         sum(case
                 when previous_breach_at is null
                   or epoch(measured_at - previous_breach_at) > {{ var('alert_merge_minutes') }} * 60
@@ -36,7 +38,12 @@ episodes as (
 )
 
 select
-    *,
+    series_id,
+    episode_no,
+    episode_start,
+    episode_end,
+    breach_count,
+    peak_z,
     lag(episode_end) over (partition by series_id order by episode_start) as previous_episode_end,
     coalesce(
         epoch(episode_start - previous_episode_end) < {{ var('alert_cooldown_minutes') }} * 60,

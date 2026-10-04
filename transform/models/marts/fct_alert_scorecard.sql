@@ -8,7 +8,8 @@ with spans as (
 ),
 
 windows as (
-    select *, row_number() over (partition by series_id order by window_start) as window_no
+    select series_id, window_start, window_end,
+           row_number() over (partition by series_id order by window_start) as window_no
     from {{ ref('stg_nab__anomaly_windows') }}
 ),
 
