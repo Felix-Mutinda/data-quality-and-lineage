@@ -1,10 +1,23 @@
-# Python-generated files
+# python
+.venv/
 __pycache__/
-*.py[oc]
-build/
-dist/
-wheels/
-*.egg-info
+*.pyc
 
-# Virtual environments
-.venv
+# dbt
+transform/target/
+transform/dbt_packages/
+transform/logs/
+transform/package-lock.yml
+logs/
+
+# local state (rebuilt by `make reset`)
+warehouse/*.duckdb
+warehouse/*.duckdb.wal
+outputs/
+scenarios/.last_break.json
+triage/reports/
+lineage-events/
+
+# raw downloads (the pinned slice in data/ IS committed)
+data/_downloads/
+transform/.user.yml

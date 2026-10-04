@@ -1,0 +1,123 @@
+{
+  "source": "Numenta Anomaly Benchmark (NAB), MIT licence",
+  "repo": "https://github.com/numenta/NAB",
+  "commit": "ea702d75cc2258d9d7dd35ca8e5e2539d71f3140",
+  "corpus": "realAWSCloudwatch",
+  "fetched_at": "2026-10-04T09:32:14+00:00",
+  "files": [
+    {
+      "path": "data/nab/labels/combined_windows.json",
+      "url": "https://raw.githubusercontent.com/numenta/NAB/ea702d75cc2258d9d7dd35ca8e5e2539d71f3140/labels/combined_windows.json",
+      "bytes": 15359,
+      "sha256": "1e1fbc4601321aad8d0f8b3784c8134299379f68f6c1f7777565f8ffd57ab6b1"
+    },
+    {
+      "path": "data/nab/labels/combined_labels.json",
+      "url": "https://raw.githubusercontent.com/numenta/NAB/ea702d75cc2258d9d7dd35ca8e5e2539d71f3140/labels/combined_labels.json",
+      "bytes": 7015,
+      "sha256": "98724014c162fcfd4be605683517f194051a54e98756c53667bd33ddbc644d9b"
+    },
+    {
+      "path": "data/nab/realAWSCloudwatch/ec2_cpu_utilization_24ae8d.csv",
+      "url": "https://raw.githubusercontent.com/numenta/NAB/ea702d75cc2258d9d7dd35ca8e5e2539d71f3140/data/realAWSCloudwatch/ec2_cpu_utilization_24ae8d.csv",
+      "bytes": 105367,
+      "sha256": "ab446fbd8b9f37507eb2fdb06315826d8daeef02e241133ce06e0ee571ba53d9"
+    },
+    {
+      "path": "data/nab/realAWSCloudwatch/ec2_cpu_utilization_53ea38.csv",
+      "url": "https://raw.githubusercontent.com/numenta/NAB/ea702d75cc2258d9d7dd35ca8e5e2539d71f3140/data/realAWSCloudwatch/ec2_cpu_utilization_53ea38.csv",
+      "bytes": 116041,
+      "sha256": "8942e498de7b40f1b4a6d802755592c09b8fb73ce8f658763a09cb9ea1ea94ac"
+    },
+    {
+      "path": "data/nab/realAWSCloudwatch/ec2_cpu_utilization_5f5533.csv",
+      "url": "https://raw.githubusercontent.com/numenta/NAB/ea702d75cc2258d9d7dd35ca8e5e2539d71f3140/data/realAWSCloudwatch/ec2_cpu_utilization_5f5533.csv",
+      "bytes": 119229,
+      "sha256": "01613e6f632d067f11a5dfd40a188b0789752b388d9bc77a398bd06333878a76"
+    },
+    {
+      "path": "data/nab/realAWSCloudwatch/ec2_cpu_utilization_77c1ca.csv",
+      "url": "https://raw.githubusercontent.com/numenta/NAB/ea702d75cc2258d9d7dd35ca8e5e2539d71f3140/data/realAWSCloudwatch/ec2_cpu_utilization_77c1ca.csv",
+      "bytes": 106007,
+      "sha256": "90ceabd570b449241ee24ff8a116a793979b7671ce4490707311bfea0e0aae1f"
+    },
+    {
+      "path": "data/nab/realAWSCloudwatch/ec2_cpu_utilization_825cc2.csv",
+      "url": "https://raw.githubusercontent.com/numenta/NAB/ea702d75cc2258d9d7dd35ca8e5e2539d71f3140/data/realAWSCloudwatch/ec2_cpu_utilization_825cc2.csv",
+      "bytes": 113675,
+      "sha256": "d768419037c9db269343822957314f57ee21a7d9a4d41df2add0d1ba45ba84de"
+    },
+    {
+      "path": "data/nab/realAWSCloudwatch/ec2_cpu_utilization_ac20cd.csv",
+      "url": "https://raw.githubusercontent.com/numenta/NAB/ea702d75cc2258d9d7dd35ca8e5e2539d71f3140/data/realAWSCloudwatch/ec2_cpu_utilization_ac20cd.csv",
+      "bytes": 116980,
+      "sha256": "749a15c2e1a4543c21fee9cbf3338cd8a7ed5f5f8a1308b9b099b06c2c66e66b"
+    },
+    {
+      "path": "data/nab/realAWSCloudwatch/ec2_cpu_utilization_c6585a.csv",
+      "url": "https://raw.githubusercontent.com/numenta/NAB/ea702d75cc2258d9d7dd35ca8e5e2539d71f3140/data/realAWSCloudwatch/ec2_cpu_utilization_c6585a.csv",
+      "bytes": 104962,
+      "sha256": "d936cea74682ed43ac96b778352d7de294c0b0c168f4a7e6817162346cdb28c1"
+    },
+    {
+      "path": "data/nab/realAWSCloudwatch/ec2_cpu_utilization_fe7f93.csv",
+      "url": "https://raw.githubusercontent.com/numenta/NAB/ea702d75cc2258d9d7dd35ca8e5e2539d71f3140/data/realAWSCloudwatch/ec2_cpu_utilization_fe7f93.csv",
+      "bytes": 115788,
+      "sha256": "f3433f8171f4dcea86c0c7af9996d0f166f812fa0f4567f1d5cd85d2d2cd69b4"
+    },
+    {
+      "path": "data/nab/realAWSCloudwatch/ec2_disk_write_bytes_1ef3de.csv",
+      "url": "https://raw.githubusercontent.com/numenta/NAB/ea702d75cc2258d9d7dd35ca8e5e2539d71f3140/data/realAWSCloudwatch/ec2_disk_write_bytes_1ef3de.csv",
+      "bytes": 116626,
+      "sha256": "ce3d6c6a652ed7c31a6dd3727a36e128fcac6fb2381c63267ad0fbc02eccd9df"
+    },
+    {
+      "path": "data/nab/realAWSCloudwatch/ec2_disk_write_bytes_c0d644.csv",
+      "url": "https://raw.githubusercontent.com/numenta/NAB/ea702d75cc2258d9d7dd35ca8e5e2539d71f3140/data/realAWSCloudwatch/ec2_disk_write_bytes_c0d644.csv",
+      "bytes": 101626,
+      "sha256": "a0e734a66098bb81833835f0839dadafbc8ae829c51494670ee8849e46eb5b63"
+    },
+    {
+      "path": "data/nab/realAWSCloudwatch/ec2_network_in_257a54.csv",
+      "url": "https://raw.githubusercontent.com/numenta/NAB/ea702d75cc2258d9d7dd35ca8e5e2539d71f3140/data/realAWSCloudwatch/ec2_network_in_257a54.csv",
+      "bytes": 117236,
+      "sha256": "39104b08f2e0a673b5137eb7681897fcadf0955fedf565740a6a94edc63a81a4"
+    },
+    {
+      "path": "data/nab/realAWSCloudwatch/ec2_network_in_5abac7.csv",
+      "url": "https://raw.githubusercontent.com/numenta/NAB/ea702d75cc2258d9d7dd35ca8e5e2539d71f3140/data/realAWSCloudwatch/ec2_network_in_5abac7.csv",
+      "bytes": 120827,
+      "sha256": "c27ef93f582af63bf42e80d804764cbe64ae987620f3cfab5477d6ebb3c6157e"
+    },
+    {
+      "path": "data/nab/realAWSCloudwatch/elb_request_count_8c0756.csv",
+      "url": "https://raw.githubusercontent.com/numenta/NAB/ea702d75cc2258d9d7dd35ca8e5e2539d71f3140/data/realAWSCloudwatch/elb_request_count_8c0756.csv",
+      "bytes": 101052,
+      "sha256": "74c26574a01ca9fb89dddb5021e2e13c3a93eb25dc640438a9acb1ceb00f1021"
+    },
+    {
+      "path": "data/nab/realAWSCloudwatch/grok_asg_anomaly.csv",
+      "url": "https://raw.githubusercontent.com/numenta/NAB/ea702d75cc2258d9d7dd35ca8e5e2539d71f3140/data/realAWSCloudwatch/grok_asg_anomaly.csv",
+      "bytes": 131065,
+      "sha256": "86a0abe9d58e376858d2fd4f4a438f1997e24c64a09e5af03accd4e1b372ac47"
+    },
+    {
+      "path": "data/nab/realAWSCloudwatch/iio_us-east-1_i-a2eb1cd9_NetworkIn.csv",
+      "url": "https://raw.githubusercontent.com/numenta/NAB/ea702d75cc2258d9d7dd35ca8e5e2539d71f3140/data/realAWSCloudwatch/iio_us-east-1_i-a2eb1cd9_NetworkIn.csv",
+      "bytes": 37339,
+      "sha256": "f115fbe6542159eed5612445bfa620708a28ab6b41349d1432bb15c3a3b8414d"
+    },
+    {
+      "path": "data/nab/realAWSCloudwatch/rds_cpu_utilization_cc0c53.csv",
+      "url": "https://raw.githubusercontent.com/numenta/NAB/ea702d75cc2258d9d7dd35ca8e5e2539d71f3140/data/realAWSCloudwatch/rds_cpu_utilization_cc0c53.csv",
+      "bytes": 117806,
+      "sha256": "d5df979ef85928769a016cd0f935919d8c2a113926e21e1eb3a5001d688760e2"
+    },
+    {
+      "path": "data/nab/realAWSCloudwatch/rds_cpu_utilization_e47b3b.csv",
+      "url": "https://raw.githubusercontent.com/numenta/NAB/ea702d75cc2258d9d7dd35ca8e5e2539d71f3140/data/realAWSCloudwatch/rds_cpu_utilization_e47b3b.csv",
+      "bytes": 113599,
+      "sha256": "6b712b922ab3b3404c5a629d64a570c390c99471ee8b9b0ff7665f553fda92c1"
+    }
+  ]
+}

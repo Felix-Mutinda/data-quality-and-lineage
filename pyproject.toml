@@ -1,7 +1,16 @@
 [project]
 name = "data-quality-and-lineage"
 version = "0.1.0"
-description = "Add your description here"
+description = "From a failing data quality test to its blast radius: triage with dbt, then across tool boundaries with OpenLineage and Marquez."
 readme = "README.md"
-requires-python = ">=3.14"
-dependencies = []
+requires-python = ">=3.12"
+license = { text = "Apache-2.0" }
+dependencies = [
+    "dbt-core>=1.10,<1.13",
+    "dbt-duckdb>=1.9,<1.12",
+    "duckdb>=1.2",
+    "openlineage-dbt>=1.30",
+    "openlineage-python>=1.30",
+    "pyyaml>=6.0",
+    "requests>=2.32",
+]
