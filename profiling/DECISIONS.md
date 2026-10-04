@@ -122,7 +122,36 @@ What the baseline says about alert fatigue, before any bad data:
 bursty byte counters (disk, network) where a z-score is a weak model. That is
 the noise floor of this system. The scenario (D4) is measured against it.
 
-### Not decided yet
+### D9. Scenario parameters, chosen by measurement
 
-Scenario parameters (which series, when, how long, stuck at what value) are
-chosen next, against this baseline.
+Every CPU series was tried two ways against the D7/D8 baseline:
+
+1. **Stuck at a normal value through a labelled incident** (2 h before its
+   first page to 4 h after its last), 11 runs: up to 2 real pages lost, and
+   one labelled incident missed entirely in 6 of 11 runs.
+2. **Stuck at the series' peak value** for 6 h and 12 h, 20 runs: **zero extra
+   pages in every run.**
+
+So D4's "stuck high produces an alert storm" is **wrong for this system**: the
+24 h trailing baseline still holds the earlier variance, so neither the frozen
+plateau nor the recovery scores as anomalous. What a stuck agent does here
+is make the detector blind, and then miscalibrate it.
+
+Chosen: `ec2_cpu_utilization_fe7f93`, stuck at 2.332 % from
+2014-02-17 03:42 to 15:42 (12 h, 145 readings). Through that window the real
+host spikes to 60-70 % CPU (NAB labels the anomaly at 06:12).
+
+| | clean | stuck agent |
+|---|---|---|
+| page for the real incident | 05:42, z = 57.9 | **none** |
+| pages on fe7f93, next 24 h after recovery | 0 | **3, none in a labelled window** |
+| fleet pages | 274 | 275 |
+| labelled incidents paged (recall) | 22 / 30 (0.73) | 21 / 30 (0.70) |
+| `no_stuck_agent_over_2h` | pass | **WARN, 122 readings** |
+| every other test | pass | pass |
+
+Both alert-fatigue outcomes, from one fault: the incident that mattered was
+missed, and on-call was then paged three times for nothing. The only signal
+is a warning (D5), so the build succeeds and the bad readings flow on to
+every model and consumer downstream. Estimating that blast radius is the
+rest of this repo.
